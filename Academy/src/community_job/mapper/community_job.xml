@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="community_job">
+	<select id="list" resultType="community_job.dto.Community_jobDTO">
+		select * from(select A.*, rownum as rn from
+	  	(select num,writer,subject,reg_date,job_area,
+	  	readcount,filename,filesize,down,re_level, show, good
+		from community_job
+		order by
+		<choose>
+			<when test="list_view == 'basic'">
+				decode (writer, '관리자', 1),
+			</when>		
+			<otherwise>
+				decode (writer, '관리자', 1), ${list_view} desc,
+			</otherwise>
+		</choose>
+		ref desc, re_step) A )
+		where rn between #{start} and #{end}
+	</select>
+  	<insert id="insert">
+  		insert into community_job
+		(num,writer,subject,job_area,passwd,ref,re_step,re_level
+		,content,ip,filename,filesize)
+		values
+		( (select nvl(max(num)+1,1) from community_job)
+		,#{writer},#{subject},#{job_area},#{passwd}
+		,(select nvl(max(num)+1,1) from community_job)
+		,1,0,#{content},#{ip},#{filename},#{filesize} )
+  	</insert>
+  	<select id="getFileName" resultType="String">
+    	select filename
+    	from community_job
+   		where num=#{num}
+  	</select>
+  	<update id="plusDown">
+    	update community_job set down=down+1 where num=#{num} 
+  	</update>
+  	<select id="view" resultType="community_job.dto.Community_jobDTO">
+    	select * from community_job
+    	where num=#{num}
+  	</select>
+  	<update id="plusReadCount">
+   		update community_job set readcount=readcount+1 
+    	where num=#{num}
+  	</update>
+	<select id="pass_check" resultType="String">
+	  	select passwd from community_job
+	  	where num=#{num} and passwd=#{passwd}
+	</select>
+	<update id="update">
+	 	update community_job
+		set job_area=#{job_area}, subject=#{subject}
+		, content=#{content}, filename=#{filename}
+		, filesize=#{filesize}, down=#{down}
+		where num=#{num}
+	</update>
+	<update id="delete">
+	  	update community_job set show='n'
+	  	where num=#{num}
+	</update>
+	<select id="searchList" resultType="community_job.dto.Community_jobDTO">
+	  	select num,writer,subject,reg_date,readcount
+	  	,filename,filesize,down,re_level, show
+	   	from community_job
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchCount" resultType="String">
+	  	select count(*)
+	  	from community_job where writer like #{keyword} or subject
+	  	like #{keyword} or content like #{keyword} and show='y'
+	  	order by ref desc, re_step	 
+	</select>
+	<select id="count" resultType="int">
+  	  select count(*) from community_job
+  	</select>
+  	<update id="plusGood">
+    	update community_job set good=good+1 where num=#{num} 
+  	</update>
+</mapper>

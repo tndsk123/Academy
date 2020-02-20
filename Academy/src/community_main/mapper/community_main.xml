@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="community_main">
+	<select id="list" resultType="community_main.dto.Community_mainDTO">
+		select * from(select A.*, rownum as rn from
+	  	(select num,writer,subject,reg_date,readcount
+		,filename,filesize,down,re_level,
+		(select count(*) from community_main_comment
+		where board_num=num) comment_count, show, good
+		from community_main
+		order by
+		<choose>
+			<when test="list_view == 'basic'">
+				decode (writer, '관리자', 1),
+			</when>		
+			<otherwise>
+				decode (writer, '관리자', 1), ${list_view} desc,
+			</otherwise>
+		</choose>
+		ref desc, re_step) A )
+		where rn between #{start} and #{end}
+	</select>
+  	<insert id="insert">
+  		insert into community_main
+		(num,writer,subject,passwd,ref,re_step,re_level
+		,content,ip,filename,filesize)
+		values
+		( (select nvl(max(num)+1,1) from community_main)
+		,#{writer},#{subject},#{passwd}
+		,(select nvl(max(num)+1,1) from community_main)
+		,1,0,#{content},#{ip},#{filename},#{filesize} )
+  	</insert>
+  	<select id="getFileName" resultType="String">
+    	select filename
+    	from community_main
+   		where num=#{num}
+  	</select>
+  	<update id="plusDown">
+    	update community_main set down=down+1 where num=#{num} 
+  	</update>
+  	<select id="view" resultType="community_main.dto.Community_mainDTO">
+    	select * from community_main
+    	where num=#{num}
+  	</select>
+  	<update id="plusReadCount">
+   		update community_main set readcount=readcount+1 
+    	where num=#{num}
+  	</update>
+  	<select id="commentList" resultType="community_main.dto.Community_mainDTO">
+		select * from community_main_comment 
+		where board_num=#{num}
+	</select>
+	<insert id="commentAdd">
+		insert into community_main_comment
+		(comment_num,board_num,writer,content) values
+		((select nvl(max(comment_num)+1,1) from community_main_comment)
+		, #{board_num}, #{writer}, #{content})
+	</insert>
+	<select id="pass_check" resultType="String">
+	  	select passwd from community_main
+	  	where num=#{num} and passwd=#{passwd}
+	</select>
+	<update id="update">
+	 	update community_main
+		set subject=#{subject}
+		, content=#{content}, filename=#{filename}
+		, filesize=#{filesize}, down=#{down}
+		where num=#{num}
+	</update>
+	<update id="delete">
+	  	update community_main set show='n'
+	  	where num=#{num}
+	</update>
+	<select id="searchList" resultType="community_main.dto.Community_mainDTO">
+	  	select num,writer,subject,reg_date,readcount
+	  	,filename,filesize,down,re_level
+	  	,(select count(*) from community_main_comment
+	  	where board_num=num) comment_count, show
+	   	from community_main
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchCount" resultType="String">
+	  	select count(*)
+	  	from community_main where writer like #{keyword} or subject
+	  	like #{keyword} or content like #{keyword} and show='y'
+	  	order by ref desc, re_step	 
+	</select>
+	<select id="count" resultType="int">
+  	  select count(*) from community_main
+  	</select>
+  	<update id="plusGood">
+    	update community_main set good=good+1 where num=#{num} 
+  	</update>
+</mapper>

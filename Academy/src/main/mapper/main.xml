@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Main">
+	<select id="main" resultType="community_main.dto.Community_mainDTO">
+		select * from (select * from community_main order by num desc) where show='y' and rownum &lt; 5 
+	</select>
+	<select id="job" resultType="community_job.dto.Community_jobDTO">
+		select * from (select * from community_job order by num desc) where show='y' and rownum &lt; 5
+	</select>
+	<select id="exchange" resultType="community_exchange.dto.Community_exchangeDTO">
+		select * from (select * from community_exchange order by num desc) where show='y' and rownum &lt; 5
+	</select>
+	<select id="reference" resultType="reference.dto.ReferenceDTO">
+		select * from (select * from reference order by num desc) where show='y' and rownum &lt; 5
+	</select>
+	<select id="searchMain" resultType="community_main.dto.Community_mainDTO">
+	  	select num,writer,subject,reg_date,readcount
+	  	,filename,filesize,down,re_level
+	  	,(select count(*) from community_main_comment
+	  	where board_num=num) comment_count, show
+	   	from community_main
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchJob" resultType="community_job.dto.Community_jobDTO">
+		select num,writer,subject,reg_date,job_area,readcount
+	  	,filename,filesize,down,re_level, show
+	   	from community_job
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword} or job_area like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchExchange" resultType="community_exchange.dto.Community_exchangeDTO">
+		select num,writer,subject,reg_date,readcount
+	  	,filename,filesize,down,re_level
+	  	,(select count(*) from community_exchange_comment
+	  	where board_num=num) comment_count, show
+	   	from community_exchange
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchReference" resultType="reference.dto.ReferenceDTO">
+		select num,writer,subject,reg_date,readcount
+	  	,division,filename,filesize,down,re_level
+	  	,(select count(*) from reference_comment
+	  	where board_num=num) comment_count, show
+	   	from reference
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword} or division like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+</mapper>

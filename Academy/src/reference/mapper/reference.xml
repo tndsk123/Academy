@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reference">
+	<select id="list" resultType="reference.dto.ReferenceDTO">
+		select * from(select A.*, rownum as rn from
+	  	(select num,writer,subject,division,reg_date,readcount
+		,filename,filesize,down,re_level,
+		(select count(*) from reference_comment
+		where board_num=num) comment_count, show, good
+		from reference
+		<choose>
+			<when test="division == 'all'">
+				order by num asc) A )
+				where rn between #{start} and #{end}
+			</when>
+			<otherwise>
+				where division=#{division}
+				order by num asc) A )
+				where rn between #{start} and #{end}
+			</otherwise>
+		</choose>				
+	</select>
+  	<insert id="insert">
+  		insert into reference
+		(num,writer,division,subject,passwd,ref,re_step,re_level
+		,content,ip,filename,filesize)
+		values
+		( (select nvl(max(num)+1,1) from reference)
+		,#{writer},#{division},#{subject},#{passwd}
+		,(select nvl(max(num)+1,1) from reference)
+		,1,0,#{content},#{ip},#{filename},#{filesize} )
+  	</insert>
+  	<select id="getFileName" resultType="String">
+    	select filename
+    	from reference
+   		where num=#{num}
+  	</select>
+  	<update id="plusDown">
+    	update reference set down=down+1 where num=#{num} 
+  	</update>
+  	<select id="view" resultType="reference.dto.ReferenceDTO">
+    	select * from reference
+    	where num=#{num}
+  	</select>
+  	<update id="plusReadCount">
+   		update reference set readcount=readcount+1 
+    	where num=#{num}
+  	</update>
+  	<select id="commentList" resultType="reference.dto.ReferenceDTO">
+		select * from reference_comment 
+		where board_num=#{num}
+	</select>
+	<insert id="commentAdd">
+		insert into reference_comment
+		(comment_num,board_num,writer,content) values
+		((select nvl(max(comment_num)+1,1) from reference_comment)
+		, #{board_num}, #{writer}, #{content})
+	</insert>
+	<select id="pass_check" resultType="String">
+	  	select passwd from reference
+	  	where num=#{num} and passwd=#{passwd}
+	</select>
+	<update id="update">
+	 	update reference
+		set division=#{division}, subject=#{subject}
+		, content=#{content}, filename=#{filename}
+		, filesize=#{filesize}, down=#{down}
+		where num=#{num}
+	</update>
+	<update id="delete">
+	  	update reference set show='n'
+	  	where num=#{num}
+	</update>
+	<select id="count" resultType="int">
+  	  select count(*) from reference 
+  	</select>
+  	<update id="plusGood">
+    	update reference set good=good+1 where num=#{num} 
+  	</update>
+  	<select id="countSearch" resultType="int">
+  	  select count(*) from reference 
+  	  <choose>
+			<when test="division == 'all'">
+				
+			</when>
+			<otherwise>
+				where division=#{division}
+			</otherwise>
+		</choose>	
+  	</select>
+</mapper>

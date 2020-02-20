@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userinfo">
+	<insert id="join">
+		insert into userInfomation(id,passwd,name,nickname,email,hp,birth,address,accesscode)
+		 values(#{id},PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd}),#{name},#{nickname},#{email},
+		 #{hp},#{birth},#{address},2)
+	</insert>
+	<select id="idcheck" resultType="String">
+		select nickname from userInfomation where id=#{id}
+	</select>
+	<select id="nicknamecheck" resultType="String">
+		select id from userInfomation where nickname=#{nickname}
+	</select>
+	<select id="login" resultType="userInfomation.dto.UserInfomationDTO">
+		select nickname, img from userInfomation where id=#{id} and passwd=PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd})
+	</select>
+	<select id="userlist" parameterType="String" resultType="userInfomation.dto.UserInfomationDTO">
+  	 	select id,passwd,name,nickname,email,hp,to_char((select birth from userInfomation where nickname=#{nickname}),'YYYY-MM-DD') 
+   		birth,address,img,imgsize,email_check from userinfomation where nickname=#{nickname}
+    </select>
+    <update id="update" parameterType="userInfomation.dto.UserInfomationDTO">
+    	update userInfomation set passwd=PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd}) ,name=#{name}, email=#{email}, birth=#{birth},
+        hp=#{hp}, address=#{address}, img=#{img}, imgsize=#{imgsize} where id=#{id} 
+    </update>
+    <delete id="delete">
+    	delete from userInfomation where id=#{id}
+    </delete>
+    <select id="look_id" resultType="String">
+    	select id from userInfomation where name=#{name} and email=#{email}
+    </select>
+    <select id="get_id" resultType="String">
+    	select id from userInfomation where email=#{email}
+    </select>
+    <select id="look_pw" resultType="String">
+    	select id from userInfomation where id=#{id} and name=#{name} and email=#{email} 
+    </select>
+    <update id="update_passwd" parameterType="String">
+    	update userInfomation set passwd=PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd}) where email=#{email}
+    </update>
+    <update id="emailcheck" parameterType="String">
+    	update userInfomation set email_check=1 where nickname=#{nickname}
+    </update>
+</mapper>

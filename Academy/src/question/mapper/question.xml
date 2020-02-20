@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="question">
+	<select id="list" resultType="question.dto.QuestionDTO">
+		select * from(select A.*, rownum as rn from
+	  	(select num,writer,subject,reg_date,readcount
+		,filename,filesize,down,re_level,passwd,
+		(select count(*) from question_comment
+		where board_num=num) comment_count, show
+		from question
+		<choose>
+			<when test="list_view == 'basic'">
+				order by
+			</when>		
+			<otherwise>
+				order by ${list_view} desc
+			</otherwise>
+		</choose>
+		ref desc, re_step) A )
+		where rn between #{start} and #{end}
+	</select>
+  	<insert id="insert">
+  		insert into question
+		(num,writer,subject,passwd,ref,re_step,re_level
+		,content,ip,filename,filesize)
+		values
+		( (select nvl(max(num)+1,1) from question)
+		,#{writer},#{subject},#{passwd}
+		,(select nvl(max(num)+1,1) from question)
+		,1,0,#{content},#{ip},#{filename},#{filesize} )
+  	</insert>
+  	<select id="getFileName" resultType="String">
+    	select filename
+    	from question
+   		where num=#{num}
+  	</select>
+  	<update id="plusDown">
+    	update question set down=down+1 where num=#{num} 
+  	</update>
+  	<select id="view" resultType="question.dto.QuestionDTO">
+    	select * from question
+    	where num=#{num}
+  	</select>
+  	<update id="plusReadCount">
+   		update question set readcount=readcount+1 
+    	where num=#{num}
+  	</update>
+  	<select id="commentList" resultType="question.dto.QuestionDTO">
+		select * from question_comment 
+		where board_num=#{num}
+	</select>
+	<insert id="commentAdd">
+		insert into question_comment
+		(comment_num,board_num,writer,content) values
+		((select nvl(max(comment_num)+1,1) from question_comment)
+		, #{board_num}, #{writer}, #{content})
+	</insert>
+	<select id="pass_check" resultType="String">
+	  	select passwd from question
+	  	where num=#{num} and passwd=#{passwd}
+	</select>
+	<update id="update">
+	 	update question
+		set subject=#{subject}
+		, content=#{content}, filename=#{filename}
+		, filesize=#{filesize}, down=#{down}
+		where num=#{num}
+	</update>
+	<update id="delete">
+	  	update question set show='n'
+	  	where num=#{num}
+	</update>
+	<select id="searchList" resultType="question.dto.QuestionDTO">
+	  	select num,writer,subject,reg_date,readcount
+	  	,filename,filesize,down,re_level
+	  	,(select count(*) from question_comment
+	  	where board_num=num) comment_count, show
+	   	from question
+	  	where  (writer like #{keyword} or subject like #{keyword} or content like #{keyword}) and show='y'
+	  	order by ref desc, re_step
+	</select>
+	<select id="searchCount" resultType="String">
+	  	select count(*)
+	  	from question where writer like #{keyword} or subject
+	  	like #{keyword} or content like #{keyword} and show='y'
+	  	order by ref desc, re_step	 
+	</select>
+	<select id="count" resultType="int">
+  	  	select count(*) from question
+  	</select>
+  	<update id="updateStep">
+	  	update question 
+		set re_step=re_step+1
+		where ref=#{ref} and re_step >= #{re_step}
+	</update>
+	<insert id="reply">
+	  	insert into question
+		(num,writer,subject,passwd,ref,re_step,re_level
+		,content,ip,filename,filesize)
+		values
+		( (select nvl(max(num)+1,1) from question)
+		,#{writer},#{subject},#{passwd}
+		,#{ref},#{re_step},#{re_level}
+		,#{content},#{ip},#{filename},#{filesize})
+	</insert>
+</mapper>
