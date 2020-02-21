@@ -120,17 +120,17 @@
   						<div class="carousel-inner">
     						<div class="carousel-item active">
     							<a href="${path}/community_main_servlet/list.do?nickname=<%=nickname%>">
-      								<img class="d-block w-100" src="${path}/images/community.png" alt="First slide" style="max-height: 500px">
+      								<img class="d-block w-100" src="${path}/images/community.png" alt="First slide" style="max-height: 800px">
       							</a>
     						</div>
    	 						<div class="carousel-item">
    	 							<a href="${path}/community_job_servlet/list.do?nickname=<%=nickname%>">
-      								<img class="d-block w-100" src="${path}/images/job.png" alt="Second slide" style="max-height: 500px">
+      								<img class="d-block w-100" src="${path}/images/job.png" alt="Second slide" style="max-height: 800px">
       							</a>
     						</div>
     						<div class="carousel-item">
     							<a href="${path}/reference_servlet/list.do?nickname=<%=nickname%>">
-     				 				<img class="d-block w-100 " src="${path}/images/reference.png" alt="Third slide" style="max-height: 500px">
+     				 				<img class="d-block w-100 " src="${path}/images/reference.png" alt="Third slide" style="max-height: 800px">
      				 			</a>
     						</div>
  	 					</div>
