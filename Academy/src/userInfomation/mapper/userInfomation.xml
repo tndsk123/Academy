@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	select id from userInfomation where name=#{name} and email=#{email}
     </select>
     <select id="get_id" resultType="String">
-    	select id from userInfomation where email=#{email}
+    	select id from userInfomation where email=#{email} and name=#{name}
     </select>
     <select id="look_pw" resultType="String">
     	select id from userInfomation where id=#{id} and name=#{name} and email=#{email} 

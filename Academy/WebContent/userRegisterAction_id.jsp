@@ -29,6 +29,7 @@
 			script.close();
 		} else {
 			session.setAttribute("email", (String)request.getParameter("email"));
+			session.setAttribute("name", (String)request.getParameter("name"));
 			PrintWriter script = response.getWriter();
 			script.println("<script>");
 			script.println("location.href = 'look_for_id.jsp';");

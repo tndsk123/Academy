@@ -13,8 +13,10 @@
 <%
     UserInfomationDAO dao = new UserInfomationDAO();
 	String email = null;
+	String name= null;
 	if(session.getAttribute("email") != null) {
 		email = (String) session.getAttribute("email");
+		name =  (String) session.getAttribute("name");
 	}
 	if(email == null) {
 		PrintWriter script = response.getWriter();
@@ -29,7 +31,7 @@
 	String from = "tndsk123@gmail.com";
 	String to = (String) session.getAttribute("email");
 	String subject = "<Mobile Communty> 아이디 확인입니다.";
-	String id = dao.get_id(email);
+	String id = dao.get_id(email,name);
 	String content = "회원님의 아이디는 <font color='blue'>'"+id +"'</font>입니다."+
 	"<br><a href='" + host + "login.jsp'>로그인 하기</a><br><a href='" + host + "look_for.jsp?id="+id+"'>비밀번호 찾기</a>";
 

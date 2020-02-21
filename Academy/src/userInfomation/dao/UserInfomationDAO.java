@@ -96,10 +96,13 @@ public class UserInfomationDAO {
 		}
 	}
 	
-	public String get_id(String email) {
+	public String get_id(String email, String name) {
 		SqlSession session = MybatisManager.getInstance().openSession();
 		String id;
-		id=session.selectOne("userinfo.get_id", email);
+		Map<String, String> map=new HashMap<>();
+		map.put("email", email);
+		map.put("name", name);
+		id=session.selectOne("userinfo.get_id", map);
 		session.close();
 		return id;
 	}
