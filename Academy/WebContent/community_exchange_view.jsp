@@ -121,7 +121,7 @@ function prePage() {
 		alert("이전글이 없습니다.");
 		return;
 	}
-	location.href="${path}/community_main_servlet/view.do?num="+num;
+	location.href="${path}/community_exchange_servlet/view.do?num="+num;
 }
 function nextPage() {
 	var num=${dto.num}-1;
@@ -129,7 +129,7 @@ function nextPage() {
 		alert("마지막 글입니다.");
 		return;
 	}
-	location.href="${path}/community_main_servlet/view.do?num="+num;
+	location.href="${path}/community_exchange_servlet/view.do?num="+num;
 }
 </script>
 <title>모바일 아카데미</title>

@@ -32,6 +32,7 @@
 			script.close();
 		} else {
 			session.setAttribute("email", (String)request.getParameter("email"));
+			session.setAttribute("id", (String)request.getParameter("id"));
 			PrintWriter script = response.getWriter();
 			script.println("<script>");
 			script.println("location.href = 'look_for_pw.jsp';");

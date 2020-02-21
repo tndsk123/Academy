@@ -123,12 +123,13 @@ public class UserInfomationDAO {
 		
 	}
 	
-	public String update_passwd(String email) {
+	public String update_passwd(String email, String id) {
 		SqlSession session = MybatisManager.getInstance().openSession();
 		String passwd;
 		passwd=Random.random("1");
 		Map<String, String> map=new HashMap<>();
 		map.put("email", email);
+		map.put("id", id);
 		map.put("passwd", passwd);
 		session.update("userinfo.update_passwd", map);
 		session.commit();

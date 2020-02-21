@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     	select id from userInfomation where id=#{id} and name=#{name} and email=#{email} 
     </select>
     <update id="update_passwd" parameterType="String">
-    	update userInfomation set passwd=PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd}) where email=#{email}
+    	update userInfomation set passwd=PACK_ENCRYPTION_DECRYPTION.FUNC_ENCRYPT(#{passwd}) where email=#{email} and id=#{id}
     </update>
     <update id="emailcheck" parameterType="String">
     	update userInfomation set email_check=1 where nickname=#{nickname}
