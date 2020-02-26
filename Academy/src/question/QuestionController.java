@@ -31,12 +31,10 @@ public class QuestionController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String url=request.getRequestURL().toString();
-		//컨텍스트 패스(웹프로젝트의 식별자)
 		String contextPath=request.getContextPath();
 		QuestionDAO dao=new QuestionDAO();
 		request.setCharacterEncoding("utf-8");
 		if(url.indexOf("list.do")!=-1) { 
-			System.out.println("리스트 실행..");
 			int count=dao.count();
 			int curPage=1;
 			if(request.getParameter("curPage")!=null) {
@@ -46,10 +44,8 @@ public class QuestionController extends HttpServlet {
 			int start=pager.getPageBegin();
 			int end=pager.getPageEnd();
 			String list_view=request.getParameter("sequence");
-			System.out.println(list_view);
 			List<QuestionDTO> list=dao.list(start,end,list_view);
 			request.setAttribute("list", list);
-			System.out.println(list);
 			request.setAttribute("page", pager);			
 			request.setAttribute("list_view", list_view);
 			String page="/question.jsp";
@@ -57,16 +53,12 @@ public class QuestionController extends HttpServlet {
 			rd.forward(request, response);			 
 		}else if(url.indexOf("insert.do")!=-1) {
 			File uploadDir=new File(Constants.UPLOAD_PATH);
-			if(!uploadDir.exists()) {//업로드디렉토리가 존재하지 않으면
-				uploadDir.mkdir();//디렉토리를 만듦
+			if(!uploadDir.exists()) {
 			}
-			//request를 확장시킨 MultipartRequest 생성
 			MultipartRequest multi=new MultipartRequest(request,Constants.UPLOAD_PATH, Constants.MAX_UPLOAD, "utf-8", new DefaultFileRenamePolicy());
 			HttpSession session=request.getSession();
 			String writer=(String)session.getAttribute("writer");
-			System.out.println(writer);
 			String subject=multi.getParameter("subject");
-			System.out.println(subject);
 			String content=multi.getParameter("content");
 			String passwd=multi.getParameter("passwd");
 			String ip=request.getRemoteAddr();
@@ -91,70 +83,51 @@ public class QuestionController extends HttpServlet {
 			dto.setContent(content);
 			dto.setPasswd(passwd);
 			dto.setIp(ip);
-			//파일 첨부를 하지 않을 경우
-			//trim() 문자열의 좌우 공백 제거
 			if(filename == null || filename.trim().equals("")) {
 				filename="-";
 			}
 			dto.setFilename(filename);
-			dto.setFilesize(filesize);
-			
+			dto.setFilesize(filesize);			
 			dao.insert(dto);
 			String page="/question_servlet/list.do";
 			response.sendRedirect(contextPath+page);
 		} else if(url.indexOf("download.do") != -1) {
 			int num=Integer.parseInt(request.getParameter("num"));
 			String filename=dao.getFileName(num);
-			System.out.println("첨부파일 이름:"+filename);
-			
-			//다운로드할 파일 경로
 			String path=Constants.UPLOAD_PATH+filename;
-			byte b[]=new byte[4096];//바이트배열 생성
-			//서버에 저장된 파일을 읽기 위한 스트림 생성
+			byte b[]=new byte[4096];
 			FileInputStream fis=new FileInputStream(path);
-			//mimeType(파일의 종류-img, mp3, txt..등)
 			String mimeType=getServletContext().getMimeType(path);
 			if(mimeType==null) {
 				mimeType="application/octet-stream;charset=utf-8";
 			}
-			//파일 이름에 한글이 포함된 경우 header 값을 보내게 되는데
-			//header에는 한글이나 특수문자가 올 수 없기 때문에
-			//8859_1(서유럽언어)를 utf-8로 변환해서
-			//한글,특수문자 처리를 해야함.
 			filename = new String(filename.getBytes("utf-8"),"8859_1");
-			//http header
 			response.setHeader("Content-Disposition", "attachment;filename="+filename);
-			//OutputStream 생성(서버에서 클라이언트에 쓰기)
 			ServletOutputStream out=response.getOutputStream();
 			int numRead;
 			while(true) {
-				numRead = fis.read(b,0,b.length);//데이터 읽음
-				if(numRead == -1) break; //더 이상 내용이 없으면
-				out.write(b,0,numRead);//데이터 쓰기
+				numRead = fis.read(b,0,b.length);
+				if(numRead == -1) break; 
+				out.write(b,0,numRead);
 			}
-			//파일 처리 관련 리소스 정리
 			out.flush();
 			out.close();
 			fis.close();
-			//다운로드 횟수 증가 처리
 			dao.plusDown(num);
 			String page="/question_servlet/list.do";
 			response.sendRedirect(contextPath+page);
 		} else if(url.indexOf("view.do") != -1) {
 			int num=Integer.parseInt(request.getParameter("num"));
-			System.out.println("num은"+num);
-			HttpSession session=request.getSession(); //조회수 증가 처리 
+			HttpSession session=request.getSession();
 			dao.plusReadCount(num,session);		 
 			QuestionDTO dto=dao.viewReplace(num);
 			int count=dao.count();
 			request.setAttribute("count", count);
 			request.setAttribute("dto", dto);
-			System.out.println(dto);
 			String page="/question_view.jsp";
 			RequestDispatcher rd=request.getRequestDispatcher(page);
 			rd.forward(request, response);
 		} else if(url.indexOf("commentList.do")!=-1) {
-			System.out.println("댓글 리스트 실행");
 			int num=Integer.parseInt(request.getParameter("num"));
 			List<Question_commentDTO> list=dao.commentList(num);
 			request.setAttribute("list", list);
@@ -163,9 +136,7 @@ public class QuestionController extends HttpServlet {
 			rd.forward(request, response);
 		} else if(url.indexOf("comment_add.do") != -1) {
 			Question_commentDTO dto=new Question_commentDTO();
-			//게시물 번호
 			int board_num=Integer.parseInt(request.getParameter("board_num"));
-			System.out.println(board_num);
 			String writer=request.getParameter("co_writer");
 			String content=request.getParameter("co_content");
 			dto.setBoard_num(board_num);
@@ -182,11 +153,11 @@ public class QuestionController extends HttpServlet {
 				request.setAttribute("dto", dao.view(num));
 				RequestDispatcher rd=request.getRequestDispatcher(page);
 				rd.forward(request, response);
-			}else {//비밀번호가 틀리면
+			}else {
 				page=contextPath+"/question_servlet/view.do?num="
 			+num+"&message=error";
 				response.sendRedirect(page);
-			}//else
+			}
 		} else if(url.indexOf("question_update.do")!=-1) {
 			File uploadDir=new File(Constants.UPLOAD_PATH);
 			if(!uploadDir.exists()) {
@@ -240,16 +211,13 @@ public class QuestionController extends HttpServlet {
 				dto.setFilesize(0);
 				dto.setDown(0);
 			}
-			//레코드 수정
 			dao.update(dto);
-			//페이지 이동
 			String page="/question_servlet/list.do";
 			response.sendRedirect(contextPath+page);
 		}else if(url.indexOf("question_delete.do")!=-1) {
 			MultipartRequest multi=new MultipartRequest(request,Constants.UPLOAD_PATH, Constants.MAX_UPLOAD, "utf-8", new DefaultFileRenamePolicy());
 			int num=Integer.parseInt(multi.getParameter("num"));
 			dao.delete(num);
-			//페이지 이동
 			String page="/question_servlet/list.do";
 			response.sendRedirect(contextPath+page);
 		}else if(url.indexOf("search.do")!=-1) {
@@ -278,7 +246,6 @@ public class QuestionController extends HttpServlet {
 			int re_level=dto.getRe_level()+1;//답변 단계
 			HttpSession session=request.getSession();
 			String writer=(String)session.getAttribute("writer");
-			System.out.println(writer);
 			String subject=request.getParameter("subject");
 			String content=request.getParameter("content");
 			String passwd=request.getParameter("passwd");
@@ -289,15 +256,11 @@ public class QuestionController extends HttpServlet {
 			dto.setRef(ref);
 			dto.setRe_level(re_level);
 			dto.setRe_step(re_step);
-			//첨부파일 관련 정보
 			dto.setFilename("-");
 			dto.setFilesize(0);
 			dto.setDown(0);
-			//답글 순서 조정
 			dao.updateStep(ref, re_step);
-			//답글 쓰기
 			dao.reply(dto);
-			//목록으로 이동
 			String page="/question_servlet/list.do";
 			response.sendRedirect(contextPath+page);
 		}

@@ -66,7 +66,7 @@ public class Community_jobDAO {
 		try {
 			session=MybatisManager.getInstance().openSession();
 			session.update("community_job.plusDown", num);
-			session.commit();//auto commit 아님
+			session.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -113,13 +113,11 @@ public class Community_jobDAO {
 			if(count_session.getAttribute("read_time_"+num)!=null) {
 				read_time=(long)count_session.getAttribute("read_time_"+num);
 			}
-			long current_time=System.currentTimeMillis();//현재시각
+			long current_time=System.currentTimeMillis();
 			session=MybatisManager.getInstance().openSession();
-			if(current_time-read_time>5*1000) {//현재시간-읽은시간>5초,
-				//하루에 한번 증가 24*60*60*1000
+			if(current_time-read_time>5*1000) {
 				session.update("community_job.plusReadCount", num);
-				session.commit();//auto commit 아님
-				//최근 열람 시각 업데이트
+				session.commit();
 				count_session.setAttribute("read_time_"+num, current_time);
 			}
 		} catch (Exception e) {
@@ -164,7 +162,7 @@ public class Community_jobDAO {
 		try {
 			session=MybatisManager.getInstance().openSession();
 			session.update("community_job.delete", num);
-			session.commit();//auto commit 아님
+			session.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

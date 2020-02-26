@@ -30,20 +30,15 @@ public class UserInfomationController extends HttpServlet {
 		UserInfomationDAO dao=new UserInfomationDAO();
 		request.setCharacterEncoding("utf-8");
 		if(url.indexOf("join.do")!=-1) {
-			System.out.println("회원등록");
 			HttpSession session=request.getSession();
 			session.removeAttribute("result");
 			session.removeAttribute("result2");
 			String id=(String)session.getAttribute("id");
 			session.removeAttribute("id");
-			System.out.println("회원id:"+id);
 			String passwd=request.getParameter("passwd");
-			System.out.println(passwd);
 			String name=request.getParameter("name");
-			System.out.println(name);
 			String nickname=(String)session.getAttribute("nickname");
 			session.removeAttribute("nickname");
-			System.out.println(nickname);
 			String birth=request.getParameter("birth");
 			String email=request.getParameter("email");
 			String hp=request.getParameter("hp");
@@ -65,10 +60,8 @@ public class UserInfomationController extends HttpServlet {
 			response.sendRedirect(contextPath+page);
 		}else if(url.indexOf("idcheck.do")!=-1) {
 			String id=request.getParameter("id");
-			System.out.println("회원id:"+id);
 			String result=null;
 			result=dao.idCheck(id);
-			System.out.println(result);
 			request.setAttribute("result", result);
 			request.setAttribute("id", id);
 			String page="/idcheck.jsp";
@@ -76,7 +69,6 @@ public class UserInfomationController extends HttpServlet {
 			rd.forward(request, response);
 		}else if(url.indexOf("nicknamecheck.do")!=-1) {
 			String nickname=request.getParameter("nickname");
-			System.out.println("회원nickname:"+nickname);
 			String result2=null;
 			result2=dao.nicknameCheck(nickname);
 			request.setAttribute("result2", result2);
@@ -88,7 +80,6 @@ public class UserInfomationController extends HttpServlet {
 			String id=request.getParameter("id");
 			String passwd=request.getParameter("passwd");
 			UserInfomationDTO dto=dao.login(id,passwd);
-			System.out.println(dto);
 			if(dto!=null) {
 				String nickname=dto.getNickname();
 				String img=dto.getImg();
@@ -113,7 +104,6 @@ public class UserInfomationController extends HttpServlet {
 		}else if(url.indexOf("idn.do")!=-1) {
 			String nickname=request.getParameter("nickname");
 			String result2=request.getParameter("result2");
-			System.out.println("nickname:"+nickname);
 			HttpSession session=request.getSession();
 			session.setAttribute("nickname", nickname);	
 			session.setAttribute("result2", result2);
@@ -128,10 +118,8 @@ public class UserInfomationController extends HttpServlet {
 		}else if(url.indexOf("userlist.do")!=-1) {
 			HttpSession session=request.getSession();
 			String nickname=(String)session.getAttribute("nickname");
-			System.out.println(nickname);
 			UserInfomationDTO dto=new UserInfomationDTO();
 			dto=dao.userList(nickname);
-			System.out.println(dto);
 			request.setAttribute("dto", dto);
 			String page="/mypage.jsp";
 			RequestDispatcher rd=request.getRequestDispatcher(page);
@@ -144,18 +132,13 @@ public class UserInfomationController extends HttpServlet {
 			}
 			MultipartRequest multi=new MultipartRequest(request,Constants.UPLOAD_PATH_IMG, Constants.MAX_UPLOAD, "utf-8", new DefaultFileRenamePolicy());
 			String id=multi.getParameter("id");
-			System.out.println(id);
 			String passwd=multi.getParameter("passwd");
-			System.out.println(passwd);
 			String name=multi.getParameter("name");
-			System.out.println(name);
 			HttpSession session=request.getSession();
 			String nickname=(String)session.getAttribute("nickname");
-			System.out.println(nickname);
 			String birth=multi.getParameter("birth");
 			String email=multi.getParameter("email");
 			String hp=multi.getParameter("hp");
-			System.out.println(hp);
 			String address=multi.getParameter("address");
 			String img="";
 			int imgsize=0;
@@ -172,7 +155,6 @@ public class UserInfomationController extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			System.out.println(img+"저장 완료");
 			UserInfomationDTO dto=new UserInfomationDTO();
 			dto.setId(id);
 			dto.setPasswd(passwd);
@@ -184,26 +166,19 @@ public class UserInfomationController extends HttpServlet {
 			dto.setAddress(address);
 			if(img == null || img.trim().equals("")) {
 				UserInfomationDTO dto2=dao.userList(nickname);
-				System.out.println(dto2);
 				String fName=dto2.getImg();
 				int fSize=dto2.getImgsize();
-				System.out.println(fName+"파일 변경 없을때 이름");
-				System.out.println(fSize+"파일 변경 없을때 사이즈");
 				dto.setImg(fName);
 				dto.setImgsize(fSize);
 			}else {
 				dto.setImg(img);
 				dto.setImgsize(imgsize);
 			}
-			System.out.println(img);
-			System.out.println(imgsize);
 			dao.update(dto);
 			String page=contextPath+"/sucess.jsp?message=update";
 			response.sendRedirect(page);
 		}else if(url.indexOf("delete.do")!=-1) {
-			System.out.println("회원정보삭제");
 			String id=request.getParameter("id");
-			System.out.println(id);
 			dao.delete(id);
 			HttpSession session=request.getSession();
 			session.invalidate();

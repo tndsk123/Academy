@@ -25,7 +25,6 @@ public class MainController extends HttpServlet {
 		MainDAO dao=new MainDAO();
 		request.setCharacterEncoding("utf-8");
 		if(url.indexOf("list.do")!=-1) {
-			System.out.println("메인 리스트 실행");
 			List<Community_mainDTO> main=dao.main();
 			List<Community_exchangeDTO> exchange=dao.exchange();
 			List<Community_jobDTO> job=dao.job();
@@ -44,13 +43,8 @@ public class MainController extends HttpServlet {
 			List<Community_jobDTO> job=dao.searchJob(keyword);
 			List<ReferenceDTO> reference=dao.searchReference(keyword);
 			if(main.isEmpty() && exchange.isEmpty() && job.isEmpty() && reference.isEmpty()) {
-				System.out.println("하나도 없네?");
 				request.setAttribute("searchList", "n");
 			}
-			System.out.println(main);
-			System.out.println(exchange);
-			System.out.println(job);
-			System.out.println(reference);
 			request.setAttribute("main", main);
 			request.setAttribute("exchange", exchange);
 			request.setAttribute("job", job);
